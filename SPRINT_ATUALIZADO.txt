@@ -1,0 +1,231 @@
+DROP TABLE IF EXISTS tbl_usuarios_tpm;
+CREATE TABLE tbl_usuarios_tpm(
+cpf INTEGER NOT NULL,
+nome VARCHAR(200) NOT NULL,
+data_nascimento DATE NOT NULL,
+rua VARCHAR(50) NOT NULL,
+numero INTEGER NOT NULL,
+complemento VARCHAR(30),
+bairro VARCHAR(30) NOT NULL,
+cidade VARCHAR(30) NOT NULL,
+estado VARCHAR(2) NOT NULL,
+email VARCHAR(200) NOT NULL,
+senha VARCHAR(15) NOT NULL
+);
+
+ALTER TABLE tbl_usuarios_tpm ADD CONSTRAINT tbl_usuarios_tpm_PK PRIMARY KEY (cpf);
+
+COMMENT ON TABLE tbl_usuarios_tpm              IS 'Tabela de usuarios';
+
+--------------------------------------------------------------------------------
+
+
+DROP TABLE IF EXISTS tbl_telefones_tpm;
+CREATE TABLE tbl_telefones_tpm(
+id_telefone INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL,
+telefone VARCHAR(9) NOT NULL,
+descricao VARCHAR(20) NOT NULL,
+cpf INTEGER
+);
+
+ALTER TABLE tbl_telefones_tpm ADD CONSTRAINT tbl_telefones_tpm_PK PRIMARY KEY (id_telefone);
+ALTER TABLE tbl_telefones_tpm ADD CONSTRAINT tbl_telefones_tpm_tbl_usuarios_tpm_FK FOREIGN KEY (cpf)REFERENCES tbl_usuarios_tpm(cpf);
+
+COMMENT ON TABLE tbl_telefones_tpm              IS 'Tabela de Telefones';
+
+
+
+--------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS tbl_bicicleta_tpm;
+CREATE TABLE tbl_bicicleta_tpm(
+num_serie INTEGER NOT NULL,
+modelo VARCHAR(200) NOT NULL,
+marca VARCHAR(200) NOT NULL,
+cor VARCHAR(15) NOT NULL,
+tamanho VARCHAR(80) NOT NULL,
+tipo VARCHAR(200) NOT NULL,
+valor NUMBER(10,2) NOT NULL,
+nota_fiscal INTEGER NOT NULL,
+ano DATE NOT NULL,
+cpf INTEGER
+);
+ALTER TABLE tbl_bicicleta_tpm ADD CONSTRAINT tbl_bicicleta_tpm_PK PRIMARY KEY (num_serie);
+ALTER TABLE tbl_bicicleta_tpm ADD CONSTRAINT tbl_bicicleta_tpm_tbl_usuarios_tpm_FK FOREIGN KEY (cpf) REFERENCES tbl_usuarios_tpm(cpf);
+
+COMMENT ON TABLE tbl_bicicleta_tpm              IS 'Tabela cadastro de Bicicleta';
+
+
+--------------------------------------------------------------------------------
+
+
+
+DROP TABLE IF EXISTS tbl_modificacoes_tpm;
+CREATE TABLE tbl_modificacoes_tpm(
+id_modif INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL,
+tipo_peca VARCHAR(50),
+descricao_peca VARCHAR(80),
+historico_manutencao VARCHAR(50),
+condicoes_peca VARCHAR(80),
+valor_modificacao NUMBER(10,2),
+num_serie INTEGER
+);
+ALTER TABLE tbl_modificacoes_tpm ADD CONSTRAINT tbl_modificacoes_tpm_PK PRIMARY KEY (id_modif);
+ALTER TABLE tbl_modificacoes_tpm ADD CONSTRAINT tbl_modificacoes_tpm_tbl_bicicleta_tpm_FK FOREIGN KEY (num_serie) REFERENCES tbl_bicicleta_tpm(num_serie);
+
+COMMENT ON TABLE tbl_modificacoes_tpm              IS 'Tabela de cadastro de ModificaÃ§Ãµes';
+
+--------------------------------------------------------------------------------
+
+
+
+
+DROP TABLE IF EXISTS tbl_sinistros_tpm;
+CREATE TABLE tbl_sinistros_tpm(
+id_sinistro INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL,
+data_prejuizo DATE,
+descricao_prejuizo VARCHAR(50),
+valor_prejuizo NUMBER(10,2),
+num_serie INTEGER
+);
+ALTER TABLE tbl_sinistros_tpm ADD CONSTRAINT tbl_sinistros_tpm_PK PRIMARY KEY (id_sinistro);
+ALTER TABLE tbl_sinistros_tpm ADD CONSTRAINT tbl_sinistros_tpm_tbl_bicicleta_tpm_FK FOREIGN KEY (num_serie) REFERENCES tbl_bicicleta_tpm(num_serie);
+
+SELECT * FROM tbl_sinistros_tpm;
+COMMENT ON TABLE tbl_sinistros_tpm              IS 'Tabela de cadastro de acidentes';
+
+--------------------------------------------------------------------------------
+
+
+
+DROP TABLE IF EXISTS tbl_apolice_tpm;
+CREATE TABLE tbl_apolice_tpm(
+id_apolice INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL,
+titular VARCHAR(200) NOT NULL,
+data_emissao DATE NOT NULL,
+tipo_cobertura VARCHAR(30) NOT NULL,
+valor_cobertura NUMERIC(10,2) NOT NULL,
+data_vencimento DATE NOT NULL,
+num_serie INTEGER
+);
+ALTER TABLE tbl_apolice_tpm ADD CONSTRAINT tbl_apolice_tpm_PK PRIMARY KEY (id_apolice);
+ALTER TABLE tbl_apolice_tpm ADD CONSTRAINT tbl_apolice_tpm_tbl_bicicleta_tpm_FK FOREIGN KEY (num_serie) REFERENCES tbl_bicicleta_tpm(num_serie);
+
+SELECT * FROM tbl_apolice_tpm;
+COMMENT ON TABLE tbl_apolice_tpm              IS 'Tabela de apolice';
+
+--------------------------------------------------------------------------------
+
+
+INSERT INTO tbl_apolice_tpm (titular, data_emissao, tipo_cobertura, valor_cobertura, data_vencimento, num_serie) VALUES(
+
+
+
+
+DROP TABLE IF EXISTS tbl_fotos_tpm;
+CREATE TABLE tbl_fotos_tpm(
+policy INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL,
+foto_num_serie BLOB NOT NULL,
+data_foto_bike DATE NOT NULL,
+foto_modificacao BLOB,
+foto_sinistro BLOB,
+foto_contratante BLOB NOT NULL,
+id_apolice INTEGER NOT NULL
+);
+ALTER TABLE tbl_fotos_tpm ADD CONSTRAINT tbl_fotos_tpm_PK PRIMARY KEY (policy);
+ALTER TABLE tbl_fotos_tpm ADD CONSTRAINT tbl_fotos_tpm_tbl_apolice_tpm_FK FOREIGN KEY (id_apolice) REFERENCES tbl_apolice_tpm(id_apolice);
+
+SELECT * FROM tbl_fotos_tpm;
+COMMENT ON TABLE tbl_fotos_tpm              IS 'Tabela de fotos';
+
+--------------------------------------------------------------------------------
+
+
+
+
+INSERT ALL
+    INTO tbl_usuarios_tpm VALUES(3268465720, 'Nicole Ribeiro Tuccio' , DATE '2004-02-28', 'ClÃ³vis Graciano', 8, null, 'Fazenda Aricanduva',
+'SÃ£o Paulo', 'SP', 'nicole.tuccio.ribeiro@gmail.com', 'xpzhr68hgy2')
+    INTO tbl_usuarios_tpm VALUES(54896314787, 'Maria Luiza Lobo' , DATE '2003-06-12', 'Eros', 23, 'B', 'TaboÃ£o da Serra',
+'SÃ£o Paulo', 'SP', 'malu.lobo@gmail.com', 'LxgYHxcFsLQ')
+    INTO tbl_usuarios_tpm VALUES(84562374284, 'Laura Trujillo' , DATE '2005-02-28', 'Ipanema', 42, null, 'Santa CecÃ­lia',
+'SÃ£o Paulo', 'SP', 'laura.trujillo@gmail.com', 'Oi41cDB434p')
+    INTO tbl_usuarios_tpm VALUES(32684265720, 'Pedro Oliveira' , DATE '2000-04-26', 'Afonso de Sampaio', 52, null, 'Guarulhos',
+'SÃ£o Paulo', 'SP', 'pedro.oliveira@gmail.com', 'tZjSw30FzK7')
+    INTO tbl_usuarios_tpm VALUES(35485214796, 'Thiago Todeschini' , DATE '2003-01-23', 'Av Paulista', 1998, 'apt 23', 'Paulista',
+'SÃ£o Paulo', 'SP', 'thiago.todestini@gmail.com', 'Nxg3Jh1MNc')
+    INTO tbl_usuarios_tpm VALUES(45135742364, 'Patricia Ribeiro' , DATE '1991-03-06', 'Gustavo Geley', 168, 'apt 27 bl 3', 'Fazenda Aricanduva',
+'SÃ£o Paulo', 'SP', 'patriciaribeiro@gmail.com', 'aWq6Hd08VO')
+    INTO tbl_usuarios_tpm VALUES(55195432125, 'Robert Stabile' , DATE '1983-04-13', 'Barbosa Filho', 263, null, 'RepÃºblica',
+'SÃ£o Paulo', 'SP', 'robertstb@gmail.com', 'sxg1dfd014')
+SELECT 1 FROM DUAL;
+SELECT * FROM tbl_usuarios_tpm;
+
+--------------------------------------------------------------------------------
+
+
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(952367425, 'celular',32684265720);
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(928029680, 'celular',54896314787);
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(908008454, 'celular',84562374284);
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(935031267, 'celular',32684265720);
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(976183506, 'celular',35485214796);
+INSERT INTO tbl_telefones_tpm (telefone, descricao, cpf) VALUES(947701363, 'celular',55195432125);
+SELECT 1 FROM DUAL;
+SELECT * FROM tbl_telefones_tpm;
+
+--------------------------------------------------------------------------------
+
+
+INSERT INTO tbl_bicicleta_tpm VALUES (123456, 'Specialized S-Works Tarmac', 'Specialized', 'Azul', 'M', 'Mountain Bike', 35000.00, 12345, DATE '2022-05-10', 32684265720);
+INSERT INTO tbl_bicicleta_tpm VALUES (234567, 'Trek Madone SLR 9', 'Trek', 'Vermelha', 'L', 'Estrada', 31000.00, 12346,  DATE '2021-08-15', 54896314787);
+INSERT INTO tbl_bicicleta_tpm VALUES (345678, 'Canyon Ultimate CF EVO', 'Canyon', 'Preto', 'XL', 'Mountain Bike', 40000.00, 12347, DATE'2022-03-20', 84562374284);
+INSERT INTO tbl_bicicleta_tpm VALUES (456789, 'Pinarello Dogma F12', 'Pinarello', 'Branco', 'M', 'Estrada', 32000.00, 12348, DATE '2021-12-05', 32684265720);
+INSERT INTO tbl_bicicleta_tpm VALUES (567891, 'BMC Teammachine SLR01', 'BMC', 'Verde', 'S', 'Mountain Bike', 36000.00, 12349, DATE'2022-07-01', 35485214796);
+INSERT INTO tbl_bicicleta_tpm VALUES (678912, 'CervÃ©lo R5', 'CarvÃ©lo', 'Roxo', 'L', 'Estrada', 38000.00, 12350, DATE '2021-10-30', 45135874236);
+INSERT INTO tbl_bicicleta_tpm VALUES (789123, 'Giant Defy Advanced Pro 0', 'Giant', 'Amarelo', 'M', 'Mountain Bike', 39000.00, 12351, DATE'2022-01-15', 55195432125);
+
+SELECT * FROM tbl_bicicleta_tpm;
+
+
+--------------------------------------------------------------------------------
+
+
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('Pneu', 'Pneu Michelin Power Competition', 'Troca de pneu', 'Novo', 1000.00, 123456);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('Corrente', 'Corrente Shimano Dura-Ace', 'Troca de corrente', 'Nova', 600.00, 234567);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('Freios', 'Freios Shimano XTR', 'ManutenÃ§Ã£o de freios', 'Ã“timo estado', 800.00, 345678);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('CÃ¢mbio', 'CÃ¢mbio SRAM Red eTap', 'AtualizaÃ§Ã£o de cÃ¢mbio', 'Excelente', 2000.00, 456789);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('Roda', 'Roda Mavic Cosmic Pro Carbon', 'Troca de roda', 'Nova', 1500.00, 567891);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('GuidÃ£o', 'GuidÃ£o Zipp SL-70 Aero', 'SubstituiÃ§Ã£o de guidÃ£o', 'Excelente', 900.00, 678912);
+INSERT INTO tbl_modificacoes_tpm (tipo_peca, descricao_peca, historico_manutencao, condicoes_peca, valor_modificacao, num_serie)VALUES('Pedal', 'Pedal Look Keo Blade Carbon', 'Troca de pedal', 'Ã“timo estado', 400.00, 789123);
+SELECT 1 FROM DUAL;
+SELECT * FROM tbl_modificacoes_tpm;
+
+
+--------------------------------------------------------------------------------
+
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2023-03-15', 'ColisÃ£o com veÃ­culo', 2500.00, 123456);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2023-04-20', 'Roubo da bicicleta', 15000.00, 234567);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE '2022-05-10', 'Danos por vandalismo', 800.00, 345678);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2023-06-05', 'Queda durante o ciclismo', 8000.00, 456789);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2023-07-12', 'Roubo da bicicleta', 5000.00, 567891);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2022-08-30', 'ColisÃ£o com obstÃ¡culo', 1800.00, 678912);
+INSERT INTO tbl_sinistros_tpm (data_prejuizo, descricao_prejuizo, valor_prejuizo, num_serie)VALUES (DATE'2021-09-25', 'Danos por acidente', 2100.00, 789123);
+SELECT 1 FROM DUAL;
+SELECT * FROM tbl_sinistros_tpm;
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+DROP TABLE tbl_usuarios_tpm;
+DROP TABLE tbl_telefones_tpm;
+DROP TABLE tbl_bicicleta_tpm;
+DROP TABLE tbl_modificacoes_tpm;
+DROP TABLE tbl_sinistros_tpm;
+DROP TABLE tbl_apolice_tpm;
+DROP TABLE tbl_fotos_tpm;
